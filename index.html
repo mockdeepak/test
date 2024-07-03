@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Device Information</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+    }
+    .container {
+      text-align: center;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      padding: 20px;
+      max-width: 600px;
+      width: 100%;
+    }
+    .box {
+      padding: 20px;
+      border: 2px solid #333;
+      border-radius: 10px;
+      background-color: #e0e0e0;
+    }
+    .box p {
+      margin: 10px 0;
+      font-size: 18px;
+    }
+    .title {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    .highlight {
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="box">
+      <div class="title">Device and Screen Information</div>
+      <p>Width: <span id="width" class="highlight"></span> px</p>
+      <p>Height: <span id="height" class="highlight"></span> px</p>
+      <p>Viewport Width: <span id="vw" class="highlight"></span> vw</p>
+      <p>Viewport Height: <span id="vh" class="highlight"></span> vh</p>
+      <p>Device Pixel Ratio: <span id="dpr" class="highlight"></span></p>
+      <p>Orientation: <span id="orientation" class="highlight"></span></p>
+      <p>Pixels: <span id="pixels" class="highlight"></span></p>
+      <p>Breakpoint: <span id="breakpoint" class="highlight"></span></p>
+      <p>Platform: <span id="platform" class="highlight"></span></p>
+      <p>Browser: <span id="browser" class="highlight"></span></p>
+      <p>Device: <span id="device" class="highlight"></span></p>
+      <p>Device Name: <span id="device-name" class="highlight"></span></p>
+    </div>
+  </div>
+
+  <!-- Add the CDN links for libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ua-parser-js/1.0.0/ua-parser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mobile-detect/1.4.3/mobile-detect.min.js"></script>
+
+  <script>
+    // Function to get the browser name
+    function getBrowserInfo() {
+      const userAgent = navigator.userAgent;
+      let browserName = "Unknown Browser";
+      
+      if (userAgent.indexOf("Firefox") > -1) {
+        browserName = "Mozilla Firefox";
+      } else if (userAgent.indexOf("SamsungBrowser") > -1) {
+        browserName = "Samsung Internet";
+      } else if (userAgent.indexOf("Opera") > -1 || userAgent.indexOf("OPR") > -1) {
+        browserName = "Opera";
+      } else if (userAgent.indexOf("Trident") > -1) {
+        browserName = "Microsoft Internet Explorer";
+      } else if (userAgent.indexOf("Edge") > -1) {
+        browserName = "Microsoft Edge";
+      } else if (userAgent.indexOf("Chrome") > -1) {
+        browserName = "Google Chrome";
+      } else if (userAgent.indexOf("Safari") > -1) {
+        browserName = "Apple Safari";
+      }
+      
+      return browserName;
+    }
+
+    // Function to get the device name
+    function getDeviceName() {
+      const parser = new UAParser();
+      const result = parser.getResult();
+      const device = result.device;
+      const os = result.os;
+
+      let deviceName = `${device.vendor || 'Unknown Vendor'} ${device.model || 'Unknown Model'}`;
+      if (!device.model) {
+        deviceName = `${os.name || 'Unknown OS'} ${os.version || ''}`;
+      }
+
+      return deviceName.trim();
+    }
+
+    function updateDimensions() {
+      const widthSpan = document.getElementById('width');
+      const heightSpan = document.getElementById('height');
+      const vwSpan = document.getElementById('vw');
+      const vhSpan = document.getElementById('vh');
+      const dprSpan = document.getElementById('dpr');
+      const orientationSpan = document.getElementById('orientation');
+      const pixelsSpan = document.getElementById('pixels');
+      const breakpointSpan = document.getElementById('breakpoint');
+      const platformSpan = document.getElementById('platform');
+      const browserSpan = document.getElementById('browser');
+      const deviceSpan = document.getElementById('device');
+      const deviceNameSpan = document.getElementById('device-name');
+
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+
+      widthSpan.textContent = width;
+      heightSpan.textContent = height;
+      vwSpan.textContent = (width / window.screen.width * 100).toFixed(2);
+      vhSpan.textContent = (height / window.screen.height * 100).toFixed(2);
+      dprSpan.textContent = window.devicePixelRatio;
+      orientationSpan.textContent = width > height ? 'Landscape' : 'Portrait';
+      pixelsSpan.textContent = `${width * height} pixels`;
+
+      if (width < 576) {
+        breakpointSpan.textContent = 'Extra small (xs)';
+      } else if (width >= 576 && width < 768) {
+        breakpointSpan.textContent = 'Small (sm)';
+      } else if (width >= 768 && width < 992) {
+        breakpointSpan.textContent = 'Medium (md)';
+      } else if (width >= 992 && width < 1200) {
+        breakpointSpan.textContent = 'Large (lg)';
+      } else {
+        breakpointSpan.textContent = 'Extra large (xl)';
+      }
+
+      platformSpan.textContent = navigator.platform;
+      browserSpan.textContent = getBrowserInfo();
+      deviceSpan.textContent = new MobileDetect(window.navigator.userAgent).userAgent() || 'Unknown Device';
+      deviceNameSpan.textContent = getDeviceName();
+    }
+
+    window.addEventListener('resize', updateDimensions);
+    // Initial call to display dimensions when the page loads
+    updateDimensions();
+  </script>
+</body>
+</html>
